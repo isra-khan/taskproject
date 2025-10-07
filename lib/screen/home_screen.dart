@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:taskgameproject/screen/widgets/custom_calendar_card.dart';
 import 'package:taskgameproject/screen/widgets/custom_info_card.dart';
 import 'package:taskgameproject/util/colorconstraint.dart';
 
@@ -80,6 +81,29 @@ class HomeScreen extends StatelessWidget {
                     color: ColorConstraint.primaryColor,
                   ),
                   child: SvgPicture.asset('assets/images/add.svg'),
+                ),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text("Today's Task"),
+
+                Text('Weekly Task'),
+                Text('Monthly Task'),
+              ],
+            ),
+            Column(
+              children: const [
+                TaskCard(
+                  title: "Complete Assignment #2",
+                  date: "10 October 2025",
+                  status: "To do",
+                ),
+                TaskCard(
+                  title: "Submit Fee Challan",
+                  date: "9 October 2025",
+                  status: "Done",
                 ),
               ],
             ),
