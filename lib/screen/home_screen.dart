@@ -100,10 +100,18 @@ class _HomeScreenState extends State<HomeScreen>
                   ),
                 ),
                 Container(
+                  width: 30,
+                  height: 30,
+                  padding: EdgeInsets.symmetric(horizontal: 0),
                   decoration: BoxDecoration(
-                    color: ColorConstraint.primaryColor,
+                    color: ColorConstraint.greenColor,
+                    shape: BoxShape.circle,
                   ),
-                  child: SvgPicture.asset('assets/images/add.svg'),
+                  child: Icon(
+                    Icons.add,
+                    color: ColorConstraint.whiteTextColor,
+                    size: 28,
+                  ),
                 ),
               ],
             ),
