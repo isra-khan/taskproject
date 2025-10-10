@@ -5,6 +5,8 @@ import 'package:taskgameproject/screen/widgets/custom_textfield.dart';
 import 'package:taskgameproject/util/colorconstraint.dart';
 import 'package:taskgameproject/model/task_model.dart';
 
+import 'package:flutter/material.dart';
+
 class CreateANewScreen extends StatefulWidget {
   const CreateANewScreen({super.key});
 
@@ -40,8 +42,8 @@ class _CreateANewScreenState extends State<CreateANewScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: ColorConstraint.primaryColor,
-      body: SingleChildScrollView(
-        child: Padding(
+      body: SafeArea(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -58,8 +60,9 @@ class _CreateANewScreenState extends State<CreateANewScreen> {
               _buildDescriptionSection(),
               const SizedBox(height: 20),
               _buildPrioritySection(),
-              const Spacer(),
+              const SizedBox(height: 40),
               _buildAddButton(context),
+              const SizedBox(height: 20),
             ],
           ),
         ),
@@ -68,7 +71,6 @@ class _CreateANewScreenState extends State<CreateANewScreen> {
   }
 
   // --- Widget Methods ---
-
   Widget _buildFromToSection() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -120,79 +122,69 @@ class _CreateANewScreenState extends State<CreateANewScreen> {
     );
   }
 
-  Widget _buildTitleSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Title',
-          style: TextStyle(
-            color: ColorConstraint.textColor,
-            fontWeight: FontWeight.w400,
-            fontSize: 24,
-          ),
+  Widget _buildTitleSection() => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        'Title',
+        style: TextStyle(
+          color: ColorConstraint.textColor,
+          fontWeight: FontWeight.w400,
+          fontSize: 24,
         ),
-        const SizedBox(height: 10),
-        CustomTextField(hintText: '', controller: titleController),
-      ],
-    );
-  }
+      ),
+      const SizedBox(height: 10),
+      CustomTextField(hintText: '', controller: titleController),
+    ],
+  );
 
-  Widget _buildDescriptionSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Description',
-          style: TextStyle(
-            color: ColorConstraint.textColor,
-            fontWeight: FontWeight.w400,
-            fontSize: 24,
-          ),
+  Widget _buildDescriptionSection() => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        'Description',
+        style: TextStyle(
+          color: ColorConstraint.textColor,
+          fontWeight: FontWeight.w400,
+          fontSize: 24,
         ),
-        const SizedBox(height: 10),
-        CustomTextField(
-          hintText: '',
-          maxLines: 4,
-          controller: descriptionController,
-        ),
-      ],
-    );
-  }
+      ),
+      const SizedBox(height: 10),
+      CustomTextField(
+        hintText: '',
+        maxLines: 4,
+        controller: descriptionController,
+      ),
+    ],
+  );
 
-  Widget _buildPrioritySection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Choose Priority',
-          style: TextStyle(
-            color: ColorConstraint.textColor,
-            fontWeight: FontWeight.w400,
-            fontSize: 24,
-          ),
+  Widget _buildPrioritySection() => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        'Choose Priority',
+        style: TextStyle(
+          color: ColorConstraint.textColor,
+          fontWeight: FontWeight.w400,
+          fontSize: 24,
         ),
-        const SizedBox(height: 20),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            _buildPriorityBox('High', const Color(0xffDD1515)),
-            _buildPriorityBox('Medium', const Color(0xffA6A6A6)),
-            _buildPriorityBox('Low', const Color(0xff79AF92)),
-          ],
-        ),
-      ],
-    );
-  }
+      ),
+      const SizedBox(height: 20),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          _buildPriorityBox('High', const Color(0xffDD1515)),
+          _buildPriorityBox('Medium', const Color(0xffA6A6A6)),
+          _buildPriorityBox('Low', const Color(0xff79AF92)),
+        ],
+      ),
+    ],
+  );
 
   Widget _buildPriorityBox(String text, Color color) {
     final bool isSelected = selectedPriority == text;
     return GestureDetector(
-      onTap: () {
-        setState(() {
-          selectedPriority = text;
-        });
-      },
+      onTap: () => setState(() => selectedPriority = text),
       child: Container(
         height: 30,
         width: 100,
@@ -209,34 +201,31 @@ class _CreateANewScreenState extends State<CreateANewScreen> {
     );
   }
 
-  Widget _buildAddButton(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: CustomButton(
-        bgColor: const Color(0xff79AF92),
-        title: 'Add',
-        onPressed: () {
-          if (titleController.text.isEmpty ||
-              fromController.text.isEmpty ||
-              toController.text.isEmpty) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("Please fill all fields")),
-            );
-            return;
-          }
-
-          final newTask = TaskModel(
-            title: titleController.text,
-            fromDate: DateTime.parse(fromController.text),
-            toDate: DateTime.parse(toController.text),
-            priority: selectedPriority,
-            description: descriptionController.text,
+  Widget _buildAddButton(BuildContext context) => SizedBox(
+    width: double.infinity,
+    child: CustomButton(
+      bgColor: const Color(0xff79AF92),
+      title: 'Add',
+      onPressed: () {
+        if (titleController.text.isEmpty ||
+            fromController.text.isEmpty ||
+            toController.text.isEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Please fill all fields")),
           );
+          return;
+        }
 
-          // Return the created task to the previous screen (HomeScreen)
-          Navigator.pop(context, newTask);
-        },
-      ),
-    );
-  }
+        final newTask = TaskModel(
+          title: titleController.text,
+          fromDate: DateTime.parse(fromController.text),
+          toDate: DateTime.parse(toController.text),
+          priority: selectedPriority,
+          description: descriptionController.text,
+        );
+
+        Navigator.pop(context, newTask);
+      },
+    ),
+  );
 }
