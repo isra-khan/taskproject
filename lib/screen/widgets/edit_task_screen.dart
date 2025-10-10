@@ -1,18 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:taskgameproject/screen/create_a_new_Task_screen.dart';
+import 'package:flutter/widgets.dart';
+import 'package:taskgameproject/model/task_model.dart';
 import 'package:taskgameproject/screen/widgets/custom_button.dart';
 import 'package:taskgameproject/screen/widgets/custom_textfield.dart';
 import 'package:taskgameproject/util/colorconstraint.dart';
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:taskgameproject/model/task_model.dart';
 
-class CreateANewScreen extends StatefulWidget {
-  const CreateANewScreen({super.key});
+class EditANewScreen extends StatefulWidget {
+  final TaskModel task;
+
+  const EditANewScreen({super.key, required this.task});
 
   @override
-  State<CreateANewScreen> createState() => _CreateANewScreenState();
+  State<EditANewScreen> createState() => _EditANewScreenState();
 }
 
-class _CreateANewScreenState extends State<CreateANewScreen> {
+class _EditANewScreenState extends State<EditANewScreen> {
   final TextEditingController fromController = TextEditingController();
   final TextEditingController toController = TextEditingController();
   final TextEditingController titleController = TextEditingController();
@@ -20,7 +25,18 @@ class _CreateANewScreenState extends State<CreateANewScreen> {
 
   String selectedPriority = "Low";
 
-  // --- Date Picker Function ---
+  @override
+  void initState() {
+    super.initState();
+    // Pre-fill fields with existing task data
+    final task = widget.task;
+    titleController.text = task.title;
+    descriptionController.text = task.description;
+    fromController.text = DateFormat('yyyy-MM-dd').format(task.fromDate);
+    toController.text = DateFormat('yyyy-MM-dd').format(task.toDate);
+    selectedPriority = task.priority;
+  }
+
   Future<void> _pickDate(TextEditingController controller) async {
     final picked = await showDatePicker(
       context: context,
@@ -31,7 +47,7 @@ class _CreateANewScreenState extends State<CreateANewScreen> {
 
     if (picked != null) {
       setState(() {
-        controller.text = "${picked.year}-${picked.month}-${picked.day}";
+        controller.text = DateFormat('yyyy-MM-dd').format(picked);
       });
     }
   }
@@ -40,34 +56,37 @@ class _CreateANewScreenState extends State<CreateANewScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: ColorConstraint.primaryColor,
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Create New Tasks',
-                style: TextStyle(fontSize: 28, fontWeight: FontWeight.w800),
-              ),
-              const SizedBox(height: 20),
-              _buildFromToSection(),
-              const SizedBox(height: 20),
-              _buildTitleSection(),
-              const SizedBox(height: 20),
-              _buildDescriptionSection(),
-              const SizedBox(height: 20),
-              _buildPrioritySection(),
-              const Spacer(),
-              _buildAddButton(context),
-            ],
-          ),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.arrow_back_ios_rounded),
+
+                Text(
+                  'Edit Task',
+                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.w800),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 20),
+            _buildFromToSection(),
+            const SizedBox(height: 20),
+            _buildTitleSection(),
+            const SizedBox(height: 20),
+            _buildDescriptionSection(),
+            const SizedBox(height: 20),
+            _buildPrioritySection(),
+            const Spacer(),
+            _buildEditButton(context),
+          ],
         ),
       ),
     );
   }
-
-  // --- Widget Methods ---
 
   Widget _buildFromToSection() {
     return Row(
@@ -120,45 +139,41 @@ class _CreateANewScreenState extends State<CreateANewScreen> {
     );
   }
 
-  Widget _buildTitleSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Title',
-          style: TextStyle(
-            color: ColorConstraint.textColor,
-            fontWeight: FontWeight.w400,
-            fontSize: 24,
-          ),
+  Widget _buildTitleSection() => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        'Title',
+        style: TextStyle(
+          color: ColorConstraint.textColor,
+          fontWeight: FontWeight.w400,
+          fontSize: 24,
         ),
-        const SizedBox(height: 10),
-        CustomTextField(hintText: '', controller: titleController),
-      ],
-    );
-  }
+      ),
+      const SizedBox(height: 10),
+      CustomTextField(hintText: '', controller: titleController),
+    ],
+  );
 
-  Widget _buildDescriptionSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Description',
-          style: TextStyle(
-            color: ColorConstraint.textColor,
-            fontWeight: FontWeight.w400,
-            fontSize: 24,
-          ),
+  Widget _buildDescriptionSection() => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        'Description',
+        style: TextStyle(
+          color: ColorConstraint.textColor,
+          fontWeight: FontWeight.w400,
+          fontSize: 24,
         ),
-        const SizedBox(height: 10),
-        CustomTextField(
-          hintText: '',
-          maxLines: 4,
-          controller: descriptionController,
-        ),
-      ],
-    );
-  }
+      ),
+      const SizedBox(height: 10),
+      CustomTextField(
+        hintText: '',
+        maxLines: 4,
+        controller: descriptionController,
+      ),
+    ],
+  );
 
   Widget _buildPrioritySection() {
     return Column(
@@ -189,9 +204,7 @@ class _CreateANewScreenState extends State<CreateANewScreen> {
     final bool isSelected = selectedPriority == text;
     return GestureDetector(
       onTap: () {
-        setState(() {
-          selectedPriority = text;
-        });
+        setState(() => selectedPriority = text);
       },
       child: Container(
         height: 30,
@@ -209,12 +222,12 @@ class _CreateANewScreenState extends State<CreateANewScreen> {
     );
   }
 
-  Widget _buildAddButton(BuildContext context) {
+  Widget _buildEditButton(BuildContext context) {
     return SizedBox(
       width: double.infinity,
       child: CustomButton(
         bgColor: const Color(0xff79AF92),
-        title: 'Add',
+        title: 'Save Changes',
         onPressed: () {
           if (titleController.text.isEmpty ||
               fromController.text.isEmpty ||
@@ -225,16 +238,15 @@ class _CreateANewScreenState extends State<CreateANewScreen> {
             return;
           }
 
-          final newTask = TaskModel(
+          final editedTask = TaskModel(
             title: titleController.text,
+            description: descriptionController.text,
             fromDate: DateTime.parse(fromController.text),
             toDate: DateTime.parse(toController.text),
             priority: selectedPriority,
-            description: descriptionController.text,
           );
 
-          // Return the created task to the previous screen (HomeScreen)
-          Navigator.pop(context, newTask);
+          Navigator.pop(context, editedTask);
         },
       ),
     );
